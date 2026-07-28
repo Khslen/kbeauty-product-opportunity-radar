@@ -24,6 +24,19 @@ Build a decision-support tool that helps marketing and product teams identify pr
 
 ---
 
+## Business Impact
+
+This project demonstrates how publicly available consumer data can support product and marketing decisions in the beauty industry.
+
+Example applications include:
+
+- Identifying emerging ingredients before they become saturated
+- Prioritizing product launches based on consumer demand
+- Supporting trend reports for marketing teams
+- Monitoring shifts in consumer interest over time
+
+---
+
 ## Data Sources
 
 - Naver DataLab
