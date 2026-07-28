@@ -1,202 +1,371 @@
-from pathlib import Path
-
 import matplotlib.pyplot as plt
 import pandas as pd
 from adjustText import adjust_text
 
+from plotting import (
+    CATEGORY_LABELS,
+    COLORS,
+    DATA_DIR,
+    apply_project_style,
+    format_keyword,
+    save_figure,
+)
 
-BASE_DIR = Path(__file__).resolve().parents[2]
-PROCESSED_DIR = BASE_DIR / "data" / "processed"
-OUTPUT_DIR = BASE_DIR / "outputs"
 
-OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+apply_project_style()
 
-df = pd.read_csv(PROCESSED_DIR / "opportunity_scores.csv")
 
-category_colors = {
-    "consumer_need": "#1f77b4",
-    "ingredient": "#ff7f0e",
-    "product_format": "#2ca02c",
+# ============================================================
+# LOAD DATA
+# ============================================================
+
+input_path = DATA_DIR / "opportunity_scores.csv"
+
+if not input_path.exists():
+    raise FileNotFoundError(
+        f"Could not find {input_path}. "
+        "Run calculate_scores.py first."
+    )
+
+df = pd.read_csv(input_path)
+
+required_columns = {
+    "keyword",
+    "category",
+    "current_interest",
+    "momentum",
+    "opportunity_score",
+    "overall_rank",
 }
 
-category_labels = {
-    "consumer_need": "Consumer Need",
-    "ingredient": "Ingredient",
-    "product_format": "Product Format",
-}
+missing_columns = required_columns - set(df.columns)
+
+if missing_columns:
+    raise ValueError(
+        "The opportunity score file is missing these columns: "
+        f"{sorted(missing_columns)}"
+    )
+
+df["keyword_display"] = df["keyword"].apply(format_keyword)
+
+
+# ============================================================
+# CHART SETTINGS
+# ============================================================
 
 x_mid = df["current_interest"].median()
 y_mid = df["momentum"].median()
 
-top_10 = df.nsmallest(10, "overall_rank")
+x_min = max(
+    0,
+    df["current_interest"].min() - 8,
+)
+
+x_max = min(
+    105,
+    df["current_interest"].max() + 12,
+)
+
+y_min = max(
+    0,
+    df["momentum"].min() - 8,
+)
+
+y_max = min(
+    105,
+    df["momentum"].max() + 12,
+)
+
+top_labels = df.nsmallest(
+    10,
+    "overall_rank",
+)
+
+
+# ============================================================
+# CREATE FIGURE
+# ============================================================
 
 fig, ax = plt.subplots(figsize=(14, 10))
 
-# Quadrant shading
+ax.set_xlim(x_min, x_max)
+ax.set_ylim(y_min, y_max)
+
+
+# ============================================================
+# SOFT QUADRANT BACKGROUNDS
+# ============================================================
+
 ax.axvspan(
-    0,
+    x_min,
     x_mid,
     ymin=0,
-    ymax=y_mid / 105,
-    color="#ECEFF1",
-    alpha=0.45,
+    ymax=(y_mid - y_min) / (y_max - y_min),
+    color="#F8FAFC",
+    alpha=1,
+    zorder=0,
 )
 
 ax.axvspan(
-    0,
+    x_min,
     x_mid,
-    ymin=y_mid / 105,
+    ymin=(y_mid - y_min) / (y_max - y_min),
     ymax=1,
-    color="#FFF8E1",
-    alpha=0.45,
+    color="#FFF7ED",
+    alpha=0.75,
+    zorder=0,
 )
 
 ax.axvspan(
     x_mid,
-    100,
+    x_max,
     ymin=0,
-    ymax=y_mid / 105,
-    color="#E3F2FD",
-    alpha=0.45,
+    ymax=(y_mid - y_min) / (y_max - y_min),
+    color="#EFF6FF",
+    alpha=0.75,
+    zorder=0,
 )
 
 ax.axvspan(
     x_mid,
-    100,
-    ymin=y_mid / 105,
+    x_max,
+    ymin=(y_mid - y_min) / (y_max - y_min),
     ymax=1,
-    color="#E8F5E9",
-    alpha=0.45,
+    color="#ECFDF5",
+    alpha=0.85,
+    zorder=0,
 )
 
-# Bubbles by category
+
+# ============================================================
+# BUBBLES
+# ============================================================
+
 for category, group in df.groupby("category"):
+
+    category_color = COLORS.get(
+        category,
+        "#9CA3AF",
+    )
+
+    category_label = CATEGORY_LABELS.get(
+        category,
+        format_keyword(category),
+    )
+
+    bubble_sizes = 80 + (
+        group["opportunity_score"] ** 1.45
+    ) * 2.4
+
     ax.scatter(
         group["current_interest"],
         group["momentum"],
-        s=50 + group["opportunity_score"] * 20,
-        color=category_colors[category],
-        alpha=0.72,
-        edgecolors="black",
-        linewidth=0.6,
-        label=category_labels[category],
+        s=bubble_sizes,
+        color=category_color,
+        alpha=0.78,
+        edgecolors="white",
+        linewidth=1.4,
+        label=category_label,
         zorder=3,
     )
 
-# Median divider lines
+
+# ============================================================
+# MEDIAN DIVIDERS
+# ============================================================
+
 ax.axvline(
     x_mid,
-    linestyle="--",
-    linewidth=1.8,
-    color="#444444",
+    color=COLORS["secondary"],
+    linestyle=(0, (4, 5)),
+    linewidth=1.3,
+    alpha=0.75,
     zorder=2,
 )
 
 ax.axhline(
     y_mid,
-    linestyle="--",
-    linewidth=1.8,
-    color="#444444",
+    color=COLORS["secondary"],
+    linestyle=(0, (4, 5)),
+    linewidth=1.3,
+    alpha=0.75,
     zorder=2,
 )
 
-# Label top 10 only
+
+# ============================================================
+# TOP 10 LABELS
+# ============================================================
+
 texts = []
 
-for _, row in top_10.iterrows():
-    texts.append(
-        ax.text(
-            row["current_interest"],
-            row["momentum"],
-            f"{int(row['overall_rank'])}. {row['keyword']}",
-            fontsize=9,
-            zorder=4,
-        )
+for _, row in top_labels.iterrows():
+
+    text = ax.text(
+        row["current_interest"],
+        row["momentum"],
+        f"{int(row['overall_rank'])}. {row['keyword_display']}",
+        fontsize=9.5,
+        weight="bold",
+        color=COLORS["dark"],
+        zorder=5,
     )
+
+    texts.append(text)
 
 adjust_text(
     texts,
     ax=ax,
-    arrowprops=dict(
-        arrowstyle="-",
-        color="gray",
-        lw=0.7,
-        alpha=0.7,
-    ),
+    expand_text=(1.15, 1.25),
+    expand_points=(1.4, 1.5),
+    force_text=(0.4, 0.5),
+    force_points=(0.3, 0.4),
+    arrowprops={
+        "arrowstyle": "-",
+        "color": "#9CA3AF",
+        "linewidth": 0.8,
+        "alpha": 0.8,
+    },
 )
 
-# Quadrant labels
-ax.text(
-    x_mid + 4,
-    y_mid + 25,
-    "High Priority",
-    fontsize=16,
-    weight="bold",
-)
 
-ax.text(
-    5,
-    y_mid + 25,
-    "Emerging Opportunities",
-    fontsize=16,
-    weight="bold",
-)
+# ============================================================
+# QUADRANT LABELS
+# ============================================================
 
-ax.text(
-    x_mid + 4,
-    6,
-    "Established Markets",
-    fontsize=16,
-    weight="bold",
-)
+quadrant_style = {
+    "fontsize": 13,
+    "weight": "bold",
+    "color": COLORS["secondary"],
+    "alpha": 0.85,
+}
 
 ax.text(
-    5,
-    6,
-    "Low Potential",
-    fontsize=16,
-    weight="bold",
+    x_min + 2,
+    y_max - 5,
+    "EMERGING\nOPPORTUNITIES",
+    ha="left",
+    va="top",
+    **quadrant_style,
 )
 
-# Title and subtitle
-fig.suptitle(
+ax.text(
+    x_mid + 2,
+    y_max - 5,
+    "HIGH-PRIORITY\nOPPORTUNITIES",
+    ha="left",
+    va="top",
+    **quadrant_style,
+)
+
+ax.text(
+    x_min + 2,
+    y_min + 4,
+    "LOWER PRIORITY",
+    ha="left",
+    va="bottom",
+    **quadrant_style,
+)
+
+ax.text(
+    x_mid + 2,
+    y_min + 4,
+    "ESTABLISHED\nMARKETS",
+    ha="left",
+    va="bottom",
+    **quadrant_style,
+)
+
+
+# ============================================================
+# TITLES AND LABELS
+# ============================================================
+
+fig.text(
+    0.07,
+    0.965,
     "K-Beauty Opportunity Map",
     fontsize=24,
     weight="bold",
-    y=0.98,
+    color=COLORS["dark"],
+    ha="left",
+    va="top",
 )
 
-ax.set_title(
-    "Bubble size = Opportunity Score | Dashed lines = Median values",
+fig.text(
+    0.07,
+    0.925,
+    (
+        "Higher and further right indicates stronger momentum "
+        "and greater current consumer interest."
+    ),
+    fontsize=11,
+    color=COLORS["secondary"],
+    ha="left",
+    va="top",
+)
+
+ax.set_xlabel(
+    "Current Interest Score",
     fontsize=12,
-    color="#555555",
-    pad=14,
+    labelpad=14,
 )
 
-ax.set_xlabel("Current Interest Score", fontsize=13)
-ax.set_ylabel("Momentum Score", fontsize=13)
+ax.set_ylabel(
+    "Momentum Score",
+    fontsize=12,
+    labelpad=14,
+)
 
-ax.set_xlim(0, 100)
-ax.set_ylim(0, 105)
+ax.tick_params(
+    axis="both",
+    length=0,
+)
 
-ax.grid(alpha=0.18)
+ax.grid(
+    True,
+    color=COLORS["grid"],
+    linewidth=0.7,
+    alpha=0.6,
+    zorder=1,
+)
 
-ax.legend(
-    title="Category",
+
+# ============================================================
+# LEGEND
+# ============================================================
+
+legend = ax.legend(
+    title="Opportunity Type",
     loc="upper left",
+    bbox_to_anchor=(0.01, 0.91),
+    fontsize=10,
+    title_fontsize=10,
     frameon=True,
+    facecolor="white",
+    edgecolor=COLORS["grid"],
 )
 
-plt.tight_layout(rect=[0, 0, 1, 0.95])
+legend.get_frame().set_alpha(0.95)
 
-output_path = OUTPUT_DIR / "opportunity_map.png"
 
-plt.savefig(
-    output_path,
-    dpi=300,
-    bbox_inches="tight",
+# ============================================================
+# FOOTNOTE
+# ============================================================
+
+fig.text(
+    0.07,
+    0.025,
+    (
+        "Bubble size represents Opportunity Score. "
+        "Only the top 10 ranked opportunities are labeled."
+    ),
+    fontsize=9.5,
+    color=COLORS["secondary"],
 )
 
-plt.close()
+plt.tight_layout(rect=[0.05, 0.06, 0.98, 0.88])
 
-print(f"Saved: {output_path}")
+save_figure(fig, "opportunity_map.png")
+
+print("Opportunity map created successfully.")
