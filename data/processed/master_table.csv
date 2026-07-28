@@ -1,0 +1,25 @@
+keyword,korean_keyword,category,naver_avg,naver_latest,naver_observations,google_avg,google_latest,google_observations,window_days,video_count,total_views
+acne skincare,여드름 스킨케어,consumer_need,20.019500471698116,1.59045,106.0,44.59047619047619,38.0,105.0,30,25,35870
+anti aging skincare,안티에이징 스킨케어,consumer_need,0.633635,0.69124,2.0,33.476190476190474,19.0,105.0,30,25,22050
+brightening skincare,미백 스킨케어,consumer_need,0.99403,0.99403,9.0,30.314285714285713,22.0,105.0,30,25,25239
+glass skin,물광 피부,consumer_need,49.265276603773586,3.2258,106.0,25.695238095238096,24.0,105.0,30,25,28851
+hydrating skincare,보습 스킨케어,consumer_need,,,,16.771428571428572,9.0,105.0,30,25,35375
+hyperpigmentation skincare,색소침착 스킨케어,consumer_need,,,,36.695238095238096,24.0,105.0,30,25,100099
+sensitive skin,민감성 피부,consumer_need,26.315554000000002,13.13364,105.0,32.6,33.0,105.0,30,25,25247
+skin barrier,피부 장벽,consumer_need,46.33400924528302,5.76036,106.0,31.704761904761906,42.0,105.0,30,25,13468
+PDRN skincare,PDRN 화장품,ingredient,17.095535094339624,4.17495,106.0,25.02857142857143,42.0,105.0,30,25,33933
+azelaic acid skincare,아젤라산 화장품,ingredient,10.526306666666667,17.54385,6.0,27.495238095238093,25.0,105.0,30,25,76247
+ceramide skincare,세라마이드 화장품,ingredient,21.052625,10.52631,22.0,31.952380952380953,20.0,105.0,30,25,11933
+copper peptides skincare,구리 펩타이드 화장품,ingredient,,,,18.81904761904762,20.0,105.0,30,25,10644
+ectoin skincare,엑토인 화장품,ingredient,10.526306666666667,8.77192,3.0,21.38095238095238,29.0,105.0,30,25,9397
+exosome skincare,엑소좀 화장품,ingredient,19.357435,1.39165,106.0,28.561904761904763,14.0,105.0,30,25,11545
+panthenol skincare,판테놀 화장품,ingredient,17.024035185185184,10.52631,54.0,29.4,26.0,105.0,30,25,183063
+tranexamic acid skincare,트라넥삼산 화장품,ingredient,24.217400392156865,22.80701,51.0,25.238095238095237,19.0,105.0,30,25,46238
+hydrogel mask,하이드로겔 마스크,product_format,1.3753502857142856,0.86799,105.0,,,,30,25,13258
+korean ampoule,앰플,product_format,61.37943471698113,5.20795,106.0,36.00952380952381,32.0,105.0,30,25,6304
+korean face cream,페이스 크림,product_format,0.3968818095238095,0.04695,105.0,,,,30,25,74052
+korean serum,세럼,product_format,53.10927924528302,4.90054,106.0,37.13333333333333,35.0,105.0,30,25,17138
+korean toner pads,토너패드,product_format,43.44995877358491,4.17721,106.0,31.64761904761905,26.0,105.0,30,25,11879
+sleeping mask skincare,슬리핑 마스크,product_format,1.784754716981132,0.12521,106.0,,,,30,25,22625
+sun serum,선세럼,product_format,8.01937924528302,1.92518,106.0,,,,30,25,12814
+sunscreen stick,선스틱,product_format,28.06525754716981,5.96337,106.0,,,,30,25,17972
