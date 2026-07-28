@@ -7,7 +7,10 @@ from plotting import (
     COLORS,
     DATA_DIR,
     apply_project_style,
+    draw_header,
     format_keyword,
+    make_bars_rounded,
+    rounded_card,
     save_figure,
 )
 
@@ -97,6 +100,8 @@ def create_ranked_bar_chart(
         alpha=0.95,
     )
 
+    make_bars_rounded(ax, bars, colors)
+
     maximum_score = max(
         100,
         chart_df["opportunity_score"].max() * 1.18,
@@ -139,26 +144,7 @@ def create_ranked_bar_chart(
             color=COLORS["dark"],
         )
 
-    fig.text(
-        0.08,
-        0.965,
-        title,
-        fontsize=22,
-        weight="bold",
-        ha="left",
-        va="top",
-        color=COLORS["dark"],
-    )
-
-    fig.text(
-        0.08,
-        0.925,
-        subtitle,
-        fontsize=11,
-        ha="left",
-        va="top",
-        color=COLORS["secondary"],
-    )
+    draw_header(fig, title, subtitle, x=0.08)
 
     plt.tight_layout(rect=[0.07, 0.04, 0.98, 0.88])
 
@@ -182,7 +168,7 @@ create_ranked_bar_chart(
         "creator attention, and data reliability."
     ),
     filename="overall_ranking.png",
-    bar_color="#9CA3AF",
+    bar_color=COLORS["neutral"],
     max_items=15,
     highlight_top_three=True,
 )
@@ -272,24 +258,18 @@ ax.set_xlim(0, 14)
 ax.set_ylim(0, 8)
 ax.axis("off")
 
-fig.text(
-    0.07,
-    0.90,
+draw_header(
+    fig,
     "K-Beauty Product Opportunity Radar",
-    fontsize=25,
-    weight="bold",
-    color=COLORS["dark"],
-)
-
-fig.text(
-    0.07,
-    0.845,
     (
         "A multi-source consumer signal analysis using "
         "Naver DataLab, Google Trends, and YouTube."
     ),
-    fontsize=12,
-    color=COLORS["secondary"],
+    x=0.07,
+    title_y=0.90,
+    subtitle_y=0.845,
+    title_size=25,
+    subtitle_size=12,
 )
 
 cards = [
@@ -345,16 +325,16 @@ for index, category in enumerate(CATEGORY_LABELS):
 
 for card in cards:
 
-    rectangle = plt.Rectangle(
-        (card["x"], card["y"]),
+    rounded_card(
+        ax,
+        card["x"],
+        card["y"],
         card["width"],
         card["height"],
         facecolor=COLORS["light_background"],
         edgecolor=COLORS["grid"],
-        linewidth=1,
+        radius=0.14,
     )
-
-    ax.add_patch(rectangle)
 
     ax.text(
         card["x"] + 0.25,

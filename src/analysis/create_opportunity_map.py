@@ -7,6 +7,7 @@ from plotting import (
     COLORS,
     DATA_DIR,
     apply_project_style,
+    draw_header,
     format_keyword,
     save_figure,
 )
@@ -101,7 +102,7 @@ ax.axvspan(
     x_mid,
     ymin=0,
     ymax=(y_mid - y_min) / (y_max - y_min),
-    color="#F8FAFC",
+    color="#F7F1EC",
     alpha=1,
     zorder=0,
 )
@@ -111,8 +112,8 @@ ax.axvspan(
     x_mid,
     ymin=(y_mid - y_min) / (y_max - y_min),
     ymax=1,
-    color="#FFF7ED",
-    alpha=0.75,
+    color="#FDF1E6",
+    alpha=0.85,
     zorder=0,
 )
 
@@ -121,8 +122,8 @@ ax.axvspan(
     x_max,
     ymin=0,
     ymax=(y_mid - y_min) / (y_max - y_min),
-    color="#EFF6FF",
-    alpha=0.75,
+    color="#F3E7E0",
+    alpha=0.85,
     zorder=0,
 )
 
@@ -131,8 +132,8 @@ ax.axvspan(
     x_max,
     ymin=(y_mid - y_min) / (y_max - y_min),
     ymax=1,
-    color="#ECFDF5",
-    alpha=0.85,
+    color="#FBEAEA",
+    alpha=0.9,
     zorder=0,
 )
 
@@ -222,7 +223,7 @@ adjust_text(
     force_points=(0.3, 0.4),
     arrowprops={
         "arrowstyle": "-",
-        "color": "#9CA3AF",
+        "color": COLORS["secondary"],
         "linewidth": 0.8,
         "alpha": 0.8,
     },
@@ -281,28 +282,15 @@ ax.text(
 # TITLES AND LABELS
 # ============================================================
 
-fig.text(
-    0.07,
-    0.965,
+draw_header(
+    fig,
     "K-Beauty Opportunity Map",
-    fontsize=24,
-    weight="bold",
-    color=COLORS["dark"],
-    ha="left",
-    va="top",
-)
-
-fig.text(
-    0.07,
-    0.925,
     (
         "Higher and further right indicates stronger momentum "
         "and greater current consumer interest."
     ),
-    fontsize=11,
-    color=COLORS["secondary"],
-    ha="left",
-    va="top",
+    x=0.07,
+    title_size=24,
 )
 
 ax.set_xlabel(
